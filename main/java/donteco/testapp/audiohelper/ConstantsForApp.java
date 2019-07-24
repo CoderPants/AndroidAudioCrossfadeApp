@@ -15,6 +15,8 @@ public class ConstantsForApp {
     public static final int CROSSFADE_STEP_AMOUNT = 100;
     public static final int CROSSFADE_MAX_VOLUME = 1;
 
+    public static final long STANDART_AUDIO_INTERVAL_MS = 1000;
+
     public static final int MY_PERMISSION_REQUEST = 1;
     public static final int PERMISSION_GRANTED = PackageManager.PERMISSION_GRANTED;
     public static final String STORAGE_PERMISSION_REQUEST = Manifest.permission.READ_EXTERNAL_STORAGE;

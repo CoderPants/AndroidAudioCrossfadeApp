@@ -10,13 +10,12 @@ public class AudioPlayer {
 
    private ArrayList<MediaPlayer> mediaPlayers;
 
-
    private Activity mediaActivity;
    private ArrayList<Audio> songList;
 
    private int curSongPlayingIndex;
-   private int crossFadeDurationMS;
-   private float crossFadeTimeIntervalMS;
+   private long crossFadeDurationMS;
+   private long crossFadeTimeIntervalMS;
    private float crossFadeVolumeInterval;
 
    public AudioPlayer(Activity mediaActivity)
@@ -26,113 +25,144 @@ public class AudioPlayer {
       crossFadeVolumeInterval = (float)ConstantsForApp.CROSSFADE_MAX_VOLUME / (float)ConstantsForApp.CROSSFADE_STEP_AMOUNT;
    }
 
-
    public void setSongList(ArrayList<Audio> songList) {
       this.songList = songList;
    }
 
+   public ArrayList<MediaPlayer> getMediaPlayers() {
+      return mediaPlayers;
+   }
+
+   public void setMediaPlayers(ArrayList<MediaPlayer> mediaPlayers) {
+      this.mediaPlayers = mediaPlayers;
+   }
 
    public void setCurSongPlayingIndex(int curSongPlayingIndex) {
       this.curSongPlayingIndex = curSongPlayingIndex;
    }
 
-   public void setCrossFadeDurationMS(int crossFadeDuration) {
+   public int getCurSongPlayingIndex() {
+      return curSongPlayingIndex;
+   }
+
+   public void setCrossFadeDurationMS(long crossFadeDuration) {
       this.crossFadeDurationMS = crossFadeDuration * 1000;
    }
 
+
+
+   //Try to find equal
    public void play(Uri songUri)
    {
-      if (mediaPlayers.size() < ConstantsForApp.AUDIO_COUNT)
+      if (mediaPlayers.size() <= ConstantsForApp.AUDIO_COUNT)
       {
-         MediaPlayer newMediaPlayer = MediaPlayer.create(mediaActivity, songUri);
-         newMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener()
+         final MediaPlayer newMediaPlayer = MediaPlayer.create(mediaActivity, songUri);
+         /*newMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener()
          {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
-               stopLastPlayer();
+               stopLastPlayer(newMediaPlayer);
             }
-         });
+         });*/
 
          mediaPlayers.add(newMediaPlayer);
          newMediaPlayer.start();
-         System.out.println("Size in start:" + mediaPlayers.size());
-         crossFade();
+
+         crossFadeTimeIntervalMS =  crossFadeDurationMS / ConstantsForApp.CROSSFADE_STEP_AMOUNT;
+
+         Crossfade crossfade = new Crossfade(this, newMediaPlayer,
+                 crossFadeDurationMS, crossFadeTimeIntervalMS, crossFadeVolumeInterval);
+
+         Thread startCrossFade = new Thread(crossfade);
+         startCrossFade.start();
+
+         //crossFade(newMediaPlayer);
       }
    }
 
-   private void crossFade()
+   private void crossFade(final MediaPlayer curMediaPlayer)
    {
-      final MediaPlayer curMediaPlayer = mediaPlayers.get(curSongPlayingIndex);
-      System.out.println("Current index in crossfade " + curSongPlayingIndex);
-      curSongPlayingIndex = ++curSongPlayingIndex == ConstantsForApp.AUDIO_COUNT? 0: curSongPlayingIndex;
-      crossFadeTimeIntervalMS = (float) crossFadeDurationMS / (float)ConstantsForApp.CROSSFADE_STEP_AMOUNT;
-      final long standartAudioIntervalMS = 1000;
-
-      new Thread(new Runnable()
+      Thread crossFadeThread = new Thread(new Runnable()
       {
-         private float curAudioTimeMS = 0;
+         private long curAudioDurationMS = curMediaPlayer.getDuration();
+         private long curAudioTimeMs = 0;
          private float curVolume = 0;
-         private boolean startFadeOut = true;
-         private int songDurationMS = curMediaPlayer.getDuration();
 
          @Override
          public void run()
          {
-            float difference;
-
-            while (curAudioTimeMS <= songDurationMS && curMediaPlayer.isPlaying())
+            try
             {
-               //System.out.println("Cur volume: " + curVolume + " CurTime: " + curAudioTimeMS + " crossfade interval " + crossFadeTimeIntervalMS + " crossfadevolume interval" + crossFadeVolumeInterval);
-               //Fade in
-               if(curAudioTimeMS < crossFadeDurationMS)
+               boolean startingFadeOut = true;
+               while (curMediaPlayer.isPlaying())
                {
-                  curVolume += crossFadeVolumeInterval;
-                  curAudioTimeMS += crossFadeTimeIntervalMS;
-                  curMediaPlayer.setVolume(curVolume, curVolume);
-
-                  try {
-                     Thread.sleep((long)(crossFadeTimeIntervalMS));
-                  } catch (InterruptedException e) {
-                     e.printStackTrace();
-                  }
-               }
-               else
-               {
-                  difference = songDurationMS - curAudioTimeMS;
-                  //Fade out
-                  if (difference <= crossFadeDurationMS && difference >= 0)
+                  try
                   {
-                     System.out.println( "Difference " + (songDurationMS - curAudioTimeMS)+ "curmediaplayer" + curMediaPlayer + " crossfadeduration " + crossFadeDurationMS + " curvolume " + curVolume);
-                     if(startFadeOut)
+                     if(curAudioTimeMs <= crossFadeDurationMS)
+                        fadeIn();
+
+                     if(curAudioTimeMs > crossFadeDurationMS
+                             && (curAudioDurationMS - curAudioTimeMs) > crossFadeDurationMS)
+                        timeCounting();
+
+                     if((curAudioDurationMS - curAudioTimeMs) <= crossFadeDurationMS)
                      {
-                        play(getUriOfNextSong());
-                        startFadeOut = false;
-                     }
-                     curVolume -= crossFadeVolumeInterval;
-                     curAudioTimeMS += crossFadeTimeIntervalMS;
-
-                     curMediaPlayer.setVolume(curVolume, curVolume);
-                     try {
-                        Thread.sleep((long) (crossFadeTimeIntervalMS));
-                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        if (startingFadeOut)
+                        {
+                           startingFadeOut = false;
+                           curSongPlayingIndex = ++curSongPlayingIndex == ConstantsForApp.AUDIO_COUNT? 0: curSongPlayingIndex;
+                           play(getUriOfNextSong());
+                        }
+                        fadeOut();
                      }
                   }
-                  else
+                  catch (InterruptedException e)
                   {
-                     curAudioTimeMS += standartAudioIntervalMS;
-
-                     try {
-                        Thread.sleep(standartAudioIntervalMS);
-                     } catch (InterruptedException e) {
-                        e.printStackTrace();
-                     }
+                     System.out.println("Some thread interrupt \"crossFade\" thread!");
+                     mediaPlayers.remove(curMediaPlayer);
+                     curMediaPlayer.release();
+                     return;
                   }
                }
+               System.out.println("Size in stop: " + mediaPlayers.size() + " curSongPlaingIndex " + curSongPlayingIndex);
+               curMediaPlayer.release();
+               mediaPlayers.remove(curMediaPlayer);
+               System.out.println("Size in stop: " + mediaPlayers.size() + " curSongPlaingIndex " + curSongPlayingIndex);
+            }
+            catch (IllegalStateException e)
+            {
+               System.out.println("Player has been released");
             }
 
          }
-      }).start();
+
+         private void fadeIn() throws InterruptedException
+         {
+            curVolume += crossFadeVolumeInterval;
+            curAudioTimeMs += crossFadeTimeIntervalMS;
+            curMediaPlayer.setVolume(curVolume, curVolume);
+            //System.out.println( "Fade in" + "Cur duration " + curAudioDurationMS + " Cur Audio time ms " + curAudioTimeMs + " crossfade " + crossFadeDurationMS);
+            Thread.sleep(crossFadeTimeIntervalMS);
+         }
+
+         private void timeCounting() throws InterruptedException
+         {
+            curAudioTimeMs += ConstantsForApp.STANDART_AUDIO_INTERVAL_MS;
+            //System.out.println("Counting" + "Cur duration " + curAudioDurationMS + " Cur Audio time ms " + curAudioTimeMs + " crossfade " + crossFadeDurationMS);
+            Thread.sleep(ConstantsForApp.STANDART_AUDIO_INTERVAL_MS);
+         }
+
+         private void fadeOut() throws InterruptedException
+         {
+            curVolume -= crossFadeVolumeInterval;
+            curAudioTimeMs += crossFadeTimeIntervalMS;
+            curMediaPlayer.setVolume(curVolume, curVolume);
+            //System.out.println("Fade out" + "Cur duration " + curAudioDurationMS + " Cur Audio time ms " + curAudioTimeMs + " crossfade " + crossFadeDurationMS + " curVolume " + curVolume);
+            Thread.sleep(crossFadeTimeIntervalMS);
+         }
+      });
+
+      crossFadeThread.start();
    }
 
    public void pause() {
@@ -147,17 +177,15 @@ public class AudioPlayer {
       stopAllPlayers();
    }*/
 
-   public void stopLastPlayer()
+   public void stopLastPlayer(MediaPlayer lastPlayer)
    {
-      //Due to the crossfade effect we got 2 players playing in the same time
-      int lastMediaPlayerIndex = curSongPlayingIndex;
-      MediaPlayer lastMediaPlayer = mediaPlayers.get(lastMediaPlayerIndex);
-
-      System.out.println("Size in stop: " + mediaPlayers.size() + " curSongPlaingIndex " + curSongPlayingIndex);
-
-      mediaPlayers.remove(lastMediaPlayer);
-      lastMediaPlayer.release();
-
+      synchronized (mediaActivity)
+      {
+         System.out.println("Size in stop: " + mediaPlayers.size() + " curSongPlaingIndex " + curSongPlayingIndex);
+         lastPlayer.release();
+         mediaPlayers.remove(lastPlayer);
+         System.out.println("Size in stop: " + mediaPlayers.size() + " curSongPlaingIndex " + curSongPlayingIndex);
+      }
    }
 
    public void stopAllPlayers()
@@ -175,6 +203,7 @@ public class AudioPlayer {
    }
 
    public Uri getUriOfNextSong() {
+      System.out.println("In uri cur song playing index " + curSongPlayingIndex + " cur mediaPlayers size " + mediaPlayers.size());
       return songList.get(curSongPlayingIndex).getUri();
    }
 

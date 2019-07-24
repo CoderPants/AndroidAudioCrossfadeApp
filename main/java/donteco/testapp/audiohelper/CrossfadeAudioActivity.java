@@ -227,9 +227,10 @@ public class CrossfadeAudioActivity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
-        super.onStop();
         if(audioPlayer != null)
             audioPlayer.stopAllPlayers();
+
+        super.onStop();
     }
 
 
