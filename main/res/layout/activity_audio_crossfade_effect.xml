@@ -86,11 +86,11 @@
                     android:layout_gravity="center_horizontal"
                     android:layout_weight="@dimen/layout_weight"
                     android:layout_margin="@dimen/images_magrin"
-                    android:maxHeight="200dp"
-                    android:maxWidth="200dp"
+                    android:maxHeight="@dimen/images_max_height"
+                    android:maxWidth="@dimen/images_max_width"
                     android:adjustViewBounds="true"
                     android:background="@drawable/crossfade_activity_imgs_style"
-                    android:src="@drawable/standart_music_icon" />
+                    android:src="@drawable/standart_album_icon" />
 
                 <ImageView
                     android:id="@+id/iv_standart_music_icon_right"
@@ -99,11 +99,11 @@
                     android:layout_gravity="center_horizontal"
                     android:layout_weight="@dimen/layout_weight"
                     android:layout_margin="@dimen/images_magrin"
-                    android:maxHeight="200dp"
-                    android:maxWidth="200dp"
+                    android:maxHeight="@dimen/images_max_height"
+                    android:maxWidth="@dimen/images_max_width"
                     android:adjustViewBounds="true"
                     android:background="@drawable/crossfade_activity_imgs_style"
-                    android:src="@drawable/standart_music_icon" />
+                    android:src="@drawable/standart_album_icon" />
             </LinearLayout>
 
             <!-- for top border
@@ -111,7 +111,7 @@
             <View
                 android:id="@+id/top_border"
                 android:layout_width="match_parent"
-                android:layout_height="2dp"
+                android:layout_height="@dimen/line_size"
                 android:background="@color/color_black95" />
 
             <!-- ImageButtons for choosing songs +
@@ -186,7 +186,7 @@
             <View
                 android:id="@+id/bottom_border"
                 android:layout_width="match_parent"
-                android:layout_height="2dp"
+                android:layout_height="@dimen/line_size"
                 android:background="@color/color_black95"
                 android:layout_marginTop="@dimen/images_magrin"/>
 
@@ -276,8 +276,8 @@
                     android:adjustViewBounds="true"
                     android:layout_marginTop="@dimen/btn_go_back_to_main_magrin_top"
                     android:background="@drawable/btn_arrowback_style"
-                    android:maxWidth="@dimen/choose_song_btn_image_max_width"
-                    android:maxHeight="@dimen/chooe_song_btn_image_max_height"
+                    android:maxWidth="@dimen/btn_go_back_to_main_max_width"
+                    android:maxHeight="@dimen/btn_go_back_to_main_max_height"
                     android:paddingStart="@dimen/btn_go_back_to_main_padding_end"
                     android:paddingEnd="@dimen/btn_go_back_to_main_padding_end"
                     android:scaleType="fitStart"

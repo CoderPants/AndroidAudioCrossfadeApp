@@ -1,12 +1,5 @@
 package donteco.testapp.audiohelper;
 
-import android.Manifest;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.net.Uri;
-import android.provider.MediaStore;
-import android.view.WindowManager;
-
 public class ConstantsForApp {
 
     public static final int AUDIO_COUNT = 2;
@@ -18,11 +11,16 @@ public class ConstantsForApp {
     public static final long STANDART_AUDIO_INTERVAL_MS = 1000;
 
     public static final int MY_PERMISSION_REQUEST = 1;
-    public static final int PERMISSION_GRANTED = PackageManager.PERMISSION_GRANTED;
-    public static final String STORAGE_PERMISSION_REQUEST = Manifest.permission.READ_EXTERNAL_STORAGE;
 
-    public static final String ACTION_PICK = Intent.ACTION_PICK;
-    public static final Uri  EXTERNAL_CONTENT_URI = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-
-    public static final int FULL_SCREEN = WindowManager.LayoutParams.FLAG_FULLSCREEN;
+    public static final int standartAlbumIconId =  R.drawable.standart_album_icon;
+    public static final int leftChooseMusicIconId = R.id.iv_standart_music_icon_left;
+    public static final int rightChooseMusicIconId = R.id.iv_standart_music_icon_right;
+    public static final int chooseMusicIconId = R.drawable.choose_music_icon;
+    public static final int chooseMusicIconPressedId = R.drawable.choose_music_icon_pressed;
+    public static final int chooseMusicIconDisabledId = R.drawable.choose_music_icon_disabled;
+    public static final int playMusicIconId = R.drawable.crossfade_activity_play_icon;
+    public static final int pauseMisicIconId = R.drawable.crossfade_activity_pause_icon;
+    public static final int stopMisicIconId = R.drawable.crossfade_activity_stop_icon;
+    public static final int leftChooseMusicBtnId = R.id.img_btn_choose_first_song;
+    public static final int rightChooseMusicBtnId = R.id.img_btn_choose_second_song;
 }

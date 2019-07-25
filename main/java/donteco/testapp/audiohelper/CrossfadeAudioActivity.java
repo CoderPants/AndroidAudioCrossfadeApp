@@ -1,6 +1,8 @@
 package donteco.testapp.audiohelper;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -18,8 +20,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.loader.content.CursorLoader;
 
-
 import java.util.ArrayList;
+
+import donteco.testapp.audiohelper.player.Audio;
+import donteco.testapp.audiohelper.player.AudioPlayer;
 
 public class CrossfadeAudioActivity extends AppCompatActivity {
 
@@ -27,15 +31,9 @@ public class CrossfadeAudioActivity extends AppCompatActivity {
     private ArrayList<Audio> audioList;
     private Audio emptyAudio;
 
-    private ArrayList<ImageButton> imageButtons;
-
-    private static final int standartAlbumIconId =  R.drawable.standart_music_icon;
-    private static final int leftChooseMusicIconId = R.id.iv_standart_music_icon_left;
-    private static final int rightChooseMusicIconId = R.id.iv_standart_music_icon_right;
+    private ArrayList<ImageButton> chooseSongImgBtns;
 
     private int curChooseMusicBtnId;
-    private static final int leftChooseMusicBtnId = R.id.img_btn_choose_first_song;
-    private static final int rightChooseMusicBtnId = R.id.img_btn_choose_second_song;
 
     private ArrayList <TextView> songNamesTV;
     private ArrayList<ImageView> songImagesIV;
@@ -60,10 +58,6 @@ public class CrossfadeAudioActivity extends AppCompatActivity {
 
         backToMainButtonLogic((ImageButton) findViewById(R.id.img_btn_go_back_to_main));
 
-        /*standartAlbumIconId = R.drawable.standart_music_icon;
-        leftChooseMusicIconId = R.id.iv_standart_music_icon_left;
-        rightChooseMusicIconId = R.id.iv_standart_music_icon_right;*/
-
         crossFadeDurationBar = findViewById(R.id.crossfade_seekbar);
         crossFadeDurationTV = findViewById(R.id.tv_current_seekbar_state);
         seekBarLogic();
@@ -75,11 +69,11 @@ public class CrossfadeAudioActivity extends AppCompatActivity {
         audioList.add(emptyAudio);
 
         playPauseBtn = findViewById(R.id.img_btn_play_pause);
-        playPauseBtn.setImageResource(R.drawable.crossfade_activity_play_icon);
+        playPauseBtn.setImageResource(ConstantsForApp.playMusicIconId);
         playPauseBtnLogic();
 
         ImageButton stopBtn = findViewById(R.id.img_btn_stop);
-        stopBtn.setImageResource(R.drawable.crossfade_activity_stop_icon);
+        stopBtn.setImageResource(ConstantsForApp.stopMisicIconId);
         stopAudioBtnLogic(stopBtn);
 
         songNamesTV = new ArrayList<>(ConstantsForApp.AUDIO_COUNT);
@@ -87,13 +81,13 @@ public class CrossfadeAudioActivity extends AppCompatActivity {
         songNamesTV.add((TextView) findViewById(R.id.tv_second_song_name));
 
         songImagesIV = new ArrayList<>(ConstantsForApp.AUDIO_COUNT);
-        songImagesIV.add((ImageView) findViewById(leftChooseMusicIconId));
-        songImagesIV.add((ImageView) findViewById(rightChooseMusicIconId));
+        songImagesIV.add((ImageView) findViewById(ConstantsForApp.leftChooseMusicIconId));
+        songImagesIV.add((ImageView) findViewById(ConstantsForApp.rightChooseMusicIconId));
 
-        imageButtons = new ArrayList<>(ConstantsForApp.AUDIO_COUNT);
-        imageButtons.add( (ImageButton) findViewById(R.id.img_btn_choose_first_song) );
-        imageButtons.add( (ImageButton) findViewById(R.id.img_btn_choose_second_song) );
-        selectAudioBtnLogic(imageButtons);
+        chooseSongImgBtns = new ArrayList<>(ConstantsForApp.AUDIO_COUNT);
+        chooseSongImgBtns.add( (ImageButton) findViewById(R.id.img_btn_choose_first_song) );
+        chooseSongImgBtns.add( (ImageButton) findViewById(R.id.img_btn_choose_second_song) );
+        selectAudioBtnLogic(chooseSongImgBtns);
 
     }
 
@@ -127,8 +121,7 @@ public class CrossfadeAudioActivity extends AppCompatActivity {
             public void onStopTrackingTouch(SeekBar seekBar) { }
         });
     }
-
-    //Change isPressed state!!!!
+    
     private void playPauseBtnLogic()
     {
         playPauseBtn.setOnClickListener(new View.OnClickListener()
@@ -144,35 +137,39 @@ public class CrossfadeAudioActivity extends AppCompatActivity {
                     return;
                 }
 
-                //Check for errors
                 if(isPressed)
                 {
-                    playPauseBtn.setImageResource(R.drawable.crossfade_activity_play_icon);
+                    playPauseBtn.setImageResource(ConstantsForApp.playMusicIconId);
 
-                    audioPlayer.pause();
+                    if (audioPlayer != null)
+                        audioPlayer.pause();
 
-                    for (ImageButton chooseMusicBtn : imageButtons)
+                    for (ImageButton chooseMusicBtn : chooseSongImgBtns)
+                    {
                         chooseMusicBtn.setEnabled(true);
+                        chooseMusicBtn.setImageResource(ConstantsForApp.chooseMusicIconPressedId);
+                    }
 
                     crossFadeDurationBar.setEnabled(true);
-
                 }
                 else
                 {
-                    playPauseBtn.setImageResource(R.drawable.crossfade_activity_pause_icon);
+                    playPauseBtn.setImageResource(ConstantsForApp.pauseMisicIconId);
 
                     String infoFromSeekBar = crossFadeDurationTV.getText().toString();
                     String[] amountForSeconds = infoFromSeekBar.split(" ");
                     startPlayingMusic(Integer.parseInt(amountForSeconds[0]));
 
-                    for (ImageButton chooseMusicBtn : imageButtons)
+                    for (ImageButton chooseMusicBtn : chooseSongImgBtns)
+                    {
                         chooseMusicBtn.setEnabled(false);
+                        chooseMusicBtn.setImageResource(ConstantsForApp.chooseMusicIconDisabledId);
+                    }
 
                     crossFadeDurationBar.setEnabled(false);
                 }
 
                 isPressed = !isPressed;
-
             }
         });
     }
@@ -190,11 +187,20 @@ public class CrossfadeAudioActivity extends AppCompatActivity {
                     return;
                 }
 
-                audioPlayer.stopAllPlayers();
-                playPauseBtn.setImageResource(R.drawable.crossfade_activity_play_icon);
+                playPauseBtn.setImageResource(ConstantsForApp.playMusicIconId);
+                playPauseBtnLogic();
 
-                for (ImageButton chooseMusicBtn : imageButtons)
+                if (audioPlayer != null)
+                    audioPlayer.stopAllPlayers();
+
+                for (ImageButton chooseMusicBtn : chooseSongImgBtns)
+                {
                     chooseMusicBtn.setEnabled(true);
+                    chooseMusicBtn.setImageResource(ConstantsForApp.chooseMusicIconId);
+                }
+
+                for (ImageView imageView : songImagesIV)
+                    imageView.setImageResource(ConstantsForApp.standartAlbumIconId);
 
                 crossFadeDurationBar.setEnabled(true);
             }
@@ -211,11 +217,11 @@ public class CrossfadeAudioActivity extends AppCompatActivity {
                 activityHelper.getPermission();
                 Intent intent;
 
-                if(ContextCompat.checkSelfPermission(CrossfadeAudioActivity.this, ConstantsForApp.STORAGE_PERMISSION_REQUEST)
-                        == ConstantsForApp.PERMISSION_GRANTED)
+                if(ContextCompat.checkSelfPermission(CrossfadeAudioActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                        == PackageManager.PERMISSION_GRANTED)
                 {
                     curChooseMusicBtnId = view.getId();
-                    intent = new Intent(ConstantsForApp.ACTION_PICK, ConstantsForApp.EXTERNAL_CONTENT_URI);
+                    intent = new Intent(Intent.ACTION_PICK, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
                     startActivityForResult(intent, ConstantsForApp.MY_PERMISSION_REQUEST);
                 }
             }
@@ -233,16 +239,15 @@ public class CrossfadeAudioActivity extends AppCompatActivity {
         super.onStop();
     }
 
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
     {
         if(requestCode == ConstantsForApp.MY_PERMISSION_REQUEST
                 && grantResults.length > 0
-                && grantResults[0] == ConstantsForApp.PERMISSION_GRANTED)
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED)
         {
-            if(ContextCompat.checkSelfPermission(this, ConstantsForApp.STORAGE_PERMISSION_REQUEST)
-                    == ConstantsForApp.PERMISSION_GRANTED)
+            if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED)
                 Toast.makeText(this, "Permission granted", Toast.LENGTH_SHORT).show();
             else
                 Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
@@ -256,29 +261,28 @@ public class CrossfadeAudioActivity extends AppCompatActivity {
                 && resultCode == RESULT_OK
                 && data != null)
         {
-            //the selected audio.
-            Uri uriAudio = data.getData();
-            try {
+            try
+            {
+                Uri uriAudio = data.getData();
                 loadAudioFile(uriAudio);
 
-                TextView tv = songNamesTV.get(curAudioIndex);
-                ImageView iv = songImagesIV.get(curAudioIndex);
-                Bitmap bm;
+                TextView songDescription = songNamesTV.get(curAudioIndex);
+                ImageView albumImageStorage = songImagesIV.get(curAudioIndex);
+                Bitmap albumImage;
                 Audio audio = audioList.get(curAudioIndex);
 
-                tv.setVisibility(View.VISIBLE);
-                tv.setText(String.format("%s %s", audio.getAlbum(), audio.getArtist()));
+                songDescription.setVisibility(View.VISIBLE);
+                songDescription.setText(String.format("%s %s", audio.getArtist(), audio.getTitle()));
 
-                if( (bm = audio.getAlbumImage()) != null)
-                    iv.setImageBitmap(bm);
+                if( (albumImage = audio.getAlbumImage()) != null)
+                    albumImageStorage.setImageBitmap(albumImage);
                 else
-                    iv.setImageResource(standartAlbumIconId);
+                    albumImageStorage.setImageResource(ConstantsForApp.standartAlbumIconId);
 
                 setChooseMusicBtnImage();
-
-                //curAudioIndex++;
             }
             catch (Exception e){
+                //Toast.makeText(this, e.getCause().getMessage(), Toast.LENGTH_LONG).show();
                 Toast.makeText(this, "Something wrong, try one more time!  ", Toast.LENGTH_SHORT).show();
             }
         }
@@ -309,7 +313,7 @@ public class CrossfadeAudioActivity extends AppCompatActivity {
             if(album.equals("<unknown>"))
                 album = "";
 
-            Audio newAudio = new Audio(data, title, album, artist, audioFileUri);
+            Audio newAudio = new Audio(title, artist, data, album, audioFileUri);
             addAudioToTheList(newAudio);
 
             cursor.close();
@@ -320,11 +324,11 @@ public class CrossfadeAudioActivity extends AppCompatActivity {
     {
         switch (curChooseMusicBtnId)
         {
-            case leftChooseMusicBtnId: {
+            case ConstantsForApp.leftChooseMusicBtnId: {
                 curAudioIndex = ConstantsForApp.STARTING_POSITION;
                 break;
             }
-            case rightChooseMusicBtnId:{
+            case ConstantsForApp.rightChooseMusicBtnId:{
                 curAudioIndex = ConstantsForApp.STARTING_POSITION + 1;
                 break;
             }
@@ -340,7 +344,6 @@ public class CrossfadeAudioActivity extends AppCompatActivity {
 
         audioPlayer.setCrossFadeDurationMS(crossfadeDuration);
         audioPlayer.setSongList(audioList);
-        audioPlayer.setCurSongPlayingIndex(ConstantsForApp.STARTING_POSITION);
         audioPlayer.play(audioPlayer.getUriOfNextSong());
     }
 
@@ -348,13 +351,13 @@ public class CrossfadeAudioActivity extends AppCompatActivity {
     {
         ImageButton imageButton;
 
-        for (int i = 0; i < imageButtons.size(); i++)
+        for (int i = 0; i < chooseSongImgBtns.size(); i++)
         {
-            imageButton = imageButtons.get(i);
+            imageButton = chooseSongImgBtns.get(i);
 
             if(imageButton.getId() == curChooseMusicBtnId)
             {
-                imageButton.setImageResource(R.drawable.checkmark_music_icon);
+                imageButton.setImageResource(ConstantsForApp.chooseMusicIconPressedId);
                 break;
             }
         }

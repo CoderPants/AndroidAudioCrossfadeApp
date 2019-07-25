@@ -1,6 +1,8 @@
 package donteco.testapp.audiohelper;
 
 import android.app.Activity;
+import android.content.pm.PackageManager;
+import android.view.WindowManager;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -14,15 +16,16 @@ public class ActivityHelper  {
     }
 
     public void getRidOfTopBar(){
-        activity.getWindow().setFlags(ConstantsForApp.FULL_SCREEN, ConstantsForApp.FULL_SCREEN);
+        activity.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
     }
 
     public void getPermission()
     {
-        if(ContextCompat.checkSelfPermission(activity, ConstantsForApp.STORAGE_PERMISSION_REQUEST)
-                != ConstantsForApp.PERMISSION_GRANTED)
+        if(ContextCompat.checkSelfPermission(activity, android.Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED)
             ActivityCompat.requestPermissions(activity,
-                    new String[]{ConstantsForApp.STORAGE_PERMISSION_REQUEST},
+                    new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE},
                     ConstantsForApp.MY_PERMISSION_REQUEST);
     }
 

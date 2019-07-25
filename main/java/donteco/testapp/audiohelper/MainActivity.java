@@ -1,6 +1,8 @@
 package donteco.testapp.audiohelper;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -31,10 +33,10 @@ public class MainActivity extends AppCompatActivity {
     {
         if(requestCode == ConstantsForApp.MY_PERMISSION_REQUEST
                 && grantResults.length > 0
-                && grantResults[0] == ConstantsForApp.PERMISSION_GRANTED)
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED)
         {
-            if(ContextCompat.checkSelfPermission(this, ConstantsForApp.STORAGE_PERMISSION_REQUEST)
-                    == ConstantsForApp.PERMISSION_GRANTED)
+            if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED)
                 Toast.makeText(this, "Permission granted", Toast.LENGTH_SHORT).show();
             else
                 Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
