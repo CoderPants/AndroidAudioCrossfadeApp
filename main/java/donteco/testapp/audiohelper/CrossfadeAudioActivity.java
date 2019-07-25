@@ -151,7 +151,6 @@ public class CrossfadeAudioActivity extends AppCompatActivity {
                     }
 
                     crossFadeDurationBar.setEnabled(true);
-                    //System.out.println("In pause mediaplayers size " + audioPlayer.getMediaPlayers().size() + " ");
                 }
                 else
                 {
@@ -159,8 +158,6 @@ public class CrossfadeAudioActivity extends AppCompatActivity {
 
                     String infoFromSeekBar = crossFadeDurationTV.getText().toString();
                     String amountForSeconds = infoFromSeekBar.split(" ")[0];
-                    /*if(audioPlayer != null)
-                        System.out.println("In play mediaplayers size " + audioPlayer.getMediaPlayers().size() + " ");*/
                     startPlayingMusic(Integer.parseInt(amountForSeconds));
 
                     for (ImageButton chooseMusicBtn : chooseSongImgBtns)
@@ -269,18 +266,8 @@ public class CrossfadeAudioActivity extends AppCompatActivity {
                 Uri uriAudio = data.getData();
                 loadAudioFile(uriAudio);
 
-                TextView songDescription = songNamesTV.get(curAudioIndex);
-                ImageView albumImageStorage = songImagesIV.get(curAudioIndex);
-                Bitmap albumImage;
-                Audio audio = audioList.get(curAudioIndex);
-
-                songDescription.setVisibility(View.VISIBLE);
-                songDescription.setText(String.format("%s %s", audio.getArtist(), audio.getTitle()));
-
-                if( (albumImage = audio.getAlbumImage()) != null)
-                    albumImageStorage.setImageBitmap(albumImage);
-                else
-                    albumImageStorage.setImageResource(ConstantsForApp.standartAlbumIconId);
+                setSongData(songNamesTV.get(curAudioIndex),
+                        songImagesIV.get(curAudioIndex), audioList.get(curAudioIndex));
 
                 setChooseMusicBtnImage();
             }
@@ -347,11 +334,6 @@ public class CrossfadeAudioActivity extends AppCompatActivity {
         audioPlayer.setCrossFadeDurationMS(crossfadeDuration);
         audioPlayer.setSongList(audioList);
         audioPlayer.play(audioPlayer.getUriOfNextSong());
-        /*System.out.println("Start music :" + audioPlayer.nonePlayer() + " size " + audioPlayer.getMediaPlayers().size());
-        if(audioPlayer.nonePlayer())
-            audioPlayer.play(audioPlayer.getUriOfNextSong());
-        else
-            audioPlayer.resume();*/
     }
 
     private void setChooseMusicBtnImage()
@@ -368,5 +350,29 @@ public class CrossfadeAudioActivity extends AppCompatActivity {
                 break;
             }
         }
+    }
+
+    private void setSongData(TextView songDescription, ImageView albumImageStorage, Audio audio)
+    {
+        Bitmap albumImage;
+        songDescription.setVisibility(View.VISIBLE);
+
+        StringBuilder outputText = new StringBuilder(ConstantsForApp.LENGTH_OF_AUDIO_INFO);
+        outputText.append(audio.getArtist());
+        outputText.append(" ");
+        outputText.append(audio.getTitle());
+
+        if(outputText.length() > ConstantsForApp.LENGTH_OF_AUDIO_INFO)
+        {
+            outputText = outputText.delete(ConstantsForApp.LENGTH_OF_AUDIO_INFO , outputText.length());
+            outputText.append("...");
+        }
+
+        songDescription.setText(outputText.toString());
+
+        if( (albumImage = audio.getAlbumImage()) != null)
+            albumImageStorage.setImageBitmap(albumImage);
+        else
+            albumImageStorage.setImageResource(ConstantsForApp.standartAlbumIconId);
     }
 }

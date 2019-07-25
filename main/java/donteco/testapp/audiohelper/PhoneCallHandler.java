@@ -7,14 +7,12 @@ import android.telephony.TelephonyManager;
 
 import donteco.testapp.audiohelper.player.AudioPlayer;
 
-public class PhoneCallHandler {
-
+public class PhoneCallHandler
+{
     private Activity activity;
     private AudioPlayer audioPlayer;
 
     private boolean isCalling = false;
-    private PhoneStateListener phoneStateListener;
-    private TelephonyManager telephonyManager;
 
     public PhoneCallHandler(Activity activity, AudioPlayer audioPlayer)
     {
@@ -24,6 +22,9 @@ public class PhoneCallHandler {
 
     public void listenPhoneCalls()
     {
+        PhoneStateListener phoneStateListener;
+        TelephonyManager telephonyManager;
+
         telephonyManager = (TelephonyManager) activity.getSystemService(Context.TELEPHONY_SERVICE);
 
         phoneStateListener = new PhoneStateListener()
@@ -43,7 +44,6 @@ public class PhoneCallHandler {
                         break;
 
                     case TelephonyManager.CALL_STATE_IDLE:
-                        // Phone idle. Start playing.
                         if (audioPlayer != null)
                         {
                             if (isCalling) {
@@ -55,6 +55,8 @@ public class PhoneCallHandler {
                 }
             }
         };
-        telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
+
+        if (telephonyManager != null)
+         telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
     }
 }
