@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        activityHelper.getRidOfTopBar();
+        activityHelper.fullScreen();
         activityHelper.getPermission();
 
         startAudioCrossfadeBtnLogic((Button) findViewById(R.id.btn_starting_activity));

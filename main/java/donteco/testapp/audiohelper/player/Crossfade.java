@@ -20,6 +20,8 @@ public class Crossfade implements Runnable
     private long crossFadeTimeIntervalMS;
     private float crossFadeVolumeInterval;
 
+    //private boolean isPaused;
+
     public Crossfade(AudioPlayer audioPlayer, MediaPlayer curMediaPlayer, long crossFadeDurationMS, long crossFadeTimeIntervalMS, float crossFadeVolumeInterval)
     {
         this.audioPlayer = audioPlayer;
@@ -33,6 +35,10 @@ public class Crossfade implements Runnable
         curVolume = 0;
     }
 
+    /*public void setPaused(boolean paused) {
+        isPaused = paused;
+    }*/
+
     //Main function
     //if mediaPlayer is trying to set smth on the released player, we catch IllegalStateException
     //than, main loop
@@ -44,20 +50,23 @@ public class Crossfade implements Runnable
     {
         try
         {
-            boolean startingFadeOut = true;
+            boolean needFadeOut = true;
             while (curMediaPlayer.isPlaying())
             {
                 try
                 {
+                    /*if(isPaused)
+                        this.wait();*/
+
                     if(curAudioTimeMs <= crossFadeDurationMS)
                         fadeIn();
                     else
                     {
                         if((curAudioDurationMS - curAudioTimeMs) <= crossFadeDurationMS)
                         {
-                            if (startingFadeOut)
+                            if (needFadeOut)
                             {
-                                startingFadeOut = false;
+                                needFadeOut = false;
                                 playNextSong();
                             }
                             fadeOut();

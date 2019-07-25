@@ -54,7 +54,7 @@ public class CrossfadeAudioActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_audio_crossfade_effect);
 
-        activityHelper.getRidOfTopBar();
+        activityHelper.fullScreen();
 
         backToMainButtonLogic((ImageButton) findViewById(R.id.img_btn_go_back_to_main));
 
@@ -121,7 +121,7 @@ public class CrossfadeAudioActivity extends AppCompatActivity {
             public void onStopTrackingTouch(SeekBar seekBar) { }
         });
     }
-    
+
     private void playPauseBtnLogic()
     {
         playPauseBtn.setOnClickListener(new View.OnClickListener()
@@ -151,14 +151,17 @@ public class CrossfadeAudioActivity extends AppCompatActivity {
                     }
 
                     crossFadeDurationBar.setEnabled(true);
+                    //System.out.println("In pause mediaplayers size " + audioPlayer.getMediaPlayers().size() + " ");
                 }
                 else
                 {
                     playPauseBtn.setImageResource(ConstantsForApp.pauseMisicIconId);
 
                     String infoFromSeekBar = crossFadeDurationTV.getText().toString();
-                    String[] amountForSeconds = infoFromSeekBar.split(" ");
-                    startPlayingMusic(Integer.parseInt(amountForSeconds[0]));
+                    String amountForSeconds = infoFromSeekBar.split(" ")[0];
+                    /*if(audioPlayer != null)
+                        System.out.println("In play mediaplayers size " + audioPlayer.getMediaPlayers().size() + " ");*/
+                    startPlayingMusic(Integer.parseInt(amountForSeconds));
 
                     for (ImageButton chooseMusicBtn : chooseSongImgBtns)
                     {
@@ -282,7 +285,6 @@ public class CrossfadeAudioActivity extends AppCompatActivity {
                 setChooseMusicBtnImage();
             }
             catch (Exception e){
-                //Toast.makeText(this, e.getCause().getMessage(), Toast.LENGTH_LONG).show();
                 Toast.makeText(this, "Something wrong, try one more time!  ", Toast.LENGTH_SHORT).show();
             }
         }
@@ -345,6 +347,11 @@ public class CrossfadeAudioActivity extends AppCompatActivity {
         audioPlayer.setCrossFadeDurationMS(crossfadeDuration);
         audioPlayer.setSongList(audioList);
         audioPlayer.play(audioPlayer.getUriOfNextSong());
+        /*System.out.println("Start music :" + audioPlayer.nonePlayer() + " size " + audioPlayer.getMediaPlayers().size());
+        if(audioPlayer.nonePlayer())
+            audioPlayer.play(audioPlayer.getUriOfNextSong());
+        else
+            audioPlayer.resume();*/
     }
 
     private void setChooseMusicBtnImage()
