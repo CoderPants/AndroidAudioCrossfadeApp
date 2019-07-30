@@ -91,6 +91,15 @@ public class CrossfadeAudioActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onBackPressed()
+    {
+        Intent intent = new Intent(CrossfadeAudioActivity.this, MainActivity.class);
+        startActivity(intent);
+        finish();
+        super.onBackPressed();
+    }
+
     private void backToMainButtonLogic(ImageButton backToMenuBtn)
     {
         backToMenuBtn.setOnClickListener(new View.OnClickListener()
