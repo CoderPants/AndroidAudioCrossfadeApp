@@ -1,2 +1,2 @@
-# Android_Audio_Crossfade_App
-App for android, making crosssfade effect on two songs
+# Audio App
+App for android (marshmallow 6.0 and higher), making crosssfade effect on two songs
