@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <ImageView
+        android:id="@+id/iv_starting_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/background" />
+
+    <!-- "android:src" due to the fact, that we have .jpg image
+        "ScrollView" for old telephone models-->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/iv_starting_activity_main_img"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/iv_padding_start"
+                android:paddingEnd="@dimen/iv_padding_end"
+                android:paddingTop="@dimen/iv_padding_top"
+                android:paddingBottom="@dimen/iv_padding_bottom"
+                android:src="@drawable/starting_activity_main_image"
+                />
+
+            <Button
+                android:id="@+id/btn_starting_activity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/btn_style"
+                android:paddingStart="@dimen/btn_padding_start"
+                android:paddingEnd="@dimen/btn_padding_end"
+                android:text="@string/btn_text_start"
+                android:textColor="@color/color_white"
+                android:textSize="@dimen/btn_text_size"
+                android:fontFamily="@string/text_family"
+                />
+        </LinearLayout>
+    </ScrollView>
+</RelativeLayout>

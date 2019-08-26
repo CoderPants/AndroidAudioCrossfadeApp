@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="layout_weight">1</dimen>
+
+    <dimen name="tv_songs_names_text_size">12sp</dimen>
+    <dimen name="tv_songs_names_padding">5dp</dimen>
+    <dimen name="tv_songs_names_margin">5dp</dimen>
+
+    <dimen name="images_right_padding">10dp</dimen>
+    <dimen name="images_left_padding">10dp</dimen>
+    <dimen name="images_bottom_padding">10dp</dimen>
+    <dimen name="images_top_padding">30dp</dimen>
+    <dimen name="images_magrin">10dp</dimen>
+    <dimen name="images_max_height">200dp</dimen>
+    <dimen name="images_max_width">200dp</dimen>
+
+    <dimen name="line_size">4dp</dimen>
+
+    <dimen name="choose_song_btn_image_max_width">100dp</dimen>
+    <dimen name="chooe_song_btn_image_max_height">100dp</dimen>
+
+    <dimen name="tv_seekbar_container_top_margin">15dp</dimen>
+    <dimen name="tv_seekbar_container_bottom_margin">15dp</dimen>
+    <dimen name="tv_seekbar_container_text_size">15sp</dimen>
+
+    <dimen name="play_pause_btn_image_max_width">80dp</dimen>
+    <dimen name="play_pause_btn_image_max_height">80dp</dimen>
+
+    <dimen name="btn_go_back_to_main_padding_start">10dp</dimen>
+    <dimen name="btn_go_back_to_main_padding_end">10dp</dimen>
+    <dimen name="btn_go_back_to_main_magrin_top">15dp</dimen>
+    <dimen name="btn_go_back_to_main_max_height">100dp</dimen>
+    <dimen name="btn_go_back_to_main_max_width">100dp</dimen>
+</resources>
